@@ -71,10 +71,7 @@ func runDistribute() {
 		os.Exit(1)
 	}
 
-	// Main loop for retry functionality
 	for {
-		// Distribute chores
-		// Reset people's chores for retry
 		for i := range cfg.People {
 			cfg.People[i].Chores = []models.Chore{}
 			cfg.People[i].TotalDifficulty = 0
@@ -83,13 +80,11 @@ func runDistribute() {
 
 		cfg.People = distributor.Distribute(cfg.Chores, cfg.People)
 
-		// Always print distribution to console
 		opts := distributor.PrintOptions{
 			Verbose: verbose,
 		}
 		distributor.PrintDistribution(os.Stdout, cfg.People, opts)
 
-		// If confirmation is required and we have actions to perform
 		if confirm && (noteName != "" || sendSMS) && !dryRun {
 			result := promptConfirmation()
 			switch result {
@@ -100,15 +95,12 @@ func runDistribute() {
 				fmt.Println("Cancelled.")
 				os.Exit(0)
 			case "confirm":
-				// Continue to perform actions
 			}
 		}
 
-		// Break out of loop if not retrying
 		break
 	}
 
-	// Save to Apple Notes if requested
 	if noteName != "" {
 		if !notes.IsSupported() && !dryRun {
 			fmt.Fprintf(os.Stderr, "Error: Apple Notes is only supported on macOS\n")
@@ -123,7 +115,6 @@ func runDistribute() {
 		}
 	}
 
-	// Send messages if requested
 	if sendSMS {
 		if !sms.IsSupported() && !dryRun {
 			fmt.Fprintf(os.Stderr, "Error: iMessage is only supported on macOS\n")
@@ -139,8 +130,6 @@ func runDistribute() {
 	}
 }
 
-// promptConfirmation asks the user to confirm, retry, or cancel
-// Returns "confirm", "retry", or "cancel"
 func promptConfirmation() string {
 	reader := bufio.NewReader(os.Stdin)
 

@@ -23,7 +23,6 @@ func TestDistribute_BasicDistribution(t *testing.T) {
 
 	result := Distribute(chores, people)
 
-	// Check all chores were assigned
 	totalChoresAssigned := 0
 	for _, person := range result {
 		totalChoresAssigned += len(person.Chores)
@@ -32,7 +31,6 @@ func TestDistribute_BasicDistribution(t *testing.T) {
 		t.Errorf("Expected %d chores assigned, got %d", len(chores), totalChoresAssigned)
 	}
 
-	// Check earnings are relatively balanced (within 2 dollars)
 	if len(result) >= 2 {
 		diff := abs(result[0].TotalEarned - result[1].TotalEarned)
 		if diff > 2 {
@@ -56,13 +54,11 @@ func TestDistribute_WithCapacity(t *testing.T) {
 
 	result := Distribute(chores, people)
 
-	// Alice should only get Chore1 (difficulty 10, at capacity)
 	if result[0].TotalDifficulty > result[0].EffortCapacity {
 		t.Errorf("Alice exceeded capacity: %d > %d",
 			result[0].TotalDifficulty, result[0].EffortCapacity)
 	}
 
-	// Bob should get the remaining chores
 	if result[1].TotalDifficulty != 10 {
 		t.Errorf("Bob should have difficulty 10, got %d", result[1].TotalDifficulty)
 	}
@@ -81,7 +77,6 @@ func TestDistribute_NoCapacity(t *testing.T) {
 
 	result := Distribute(chores, people)
 
-	// With no capacity limits and same earned value, should distribute evenly
 	if len(result[0].Chores) != 1 || len(result[1].Chores) != 1 {
 		t.Errorf("Expected 1 chore each, got Alice=%d, Bob=%d",
 			len(result[0].Chores), len(result[1].Chores))
@@ -100,7 +95,6 @@ func TestDistribute_InsufficientCapacity(t *testing.T) {
 
 	result := Distribute(chores, people)
 
-	// Neither person can take the chore, so no one should have any chores
 	totalAssigned := 0
 	for _, person := range result {
 		totalAssigned += len(person.Chores)
@@ -122,7 +116,6 @@ func TestDistribute_SinglePerson(t *testing.T) {
 
 	result := Distribute(chores, people)
 
-	// Single person should get all chores
 	if len(result[0].Chores) != len(chores) {
 		t.Errorf("Expected %d chores, got %d", len(chores), len(result[0].Chores))
 	}
@@ -148,7 +141,6 @@ func TestDistribute_EmptyChores(t *testing.T) {
 
 	result := Distribute(chores, people)
 
-	// No chores to assign
 	for _, person := range result {
 		if len(person.Chores) != 0 {
 			t.Errorf("Expected no chores for %s, got %d", person.Name, len(person.Chores))
@@ -169,7 +161,6 @@ func TestDistribute_TotalsCalculatedCorrectly(t *testing.T) {
 
 	result := Distribute(chores, people)
 
-	// Verify totals are calculated correctly
 	expectedDifficulty := 12
 	expectedEarned := 9
 
@@ -196,7 +187,6 @@ func TestDistribute_CapacityEdgeCase(t *testing.T) {
 
 	result := Distribute(chores, people)
 
-	// Each person should be at or under capacity
 	for _, person := range result {
 		if person.EffortCapacity > 0 && person.TotalDifficulty > person.EffortCapacity {
 			t.Errorf("%s exceeded capacity: %d > %d",
@@ -204,7 +194,6 @@ func TestDistribute_CapacityEdgeCase(t *testing.T) {
 		}
 	}
 
-	// All chores should be assigned
 	totalAssigned := 0
 	for _, person := range result {
 		totalAssigned += len(person.Chores)
@@ -229,7 +218,6 @@ func TestPrintDistribution_DefaultMode(t *testing.T) {
 	PrintDistribution(&buf, people, PrintOptions{Verbose: false})
 	output := buf.String()
 
-	// Should contain earnings
 	if !strings.Contains(output, "Earns: $5") {
 		t.Error("Default output should contain earnings")
 	}
@@ -237,7 +225,6 @@ func TestPrintDistribution_DefaultMode(t *testing.T) {
 		t.Error("Default output should contain total earned")
 	}
 
-	// Should NOT contain difficulty or capacity
 	if strings.Contains(output, "Difficulty:") {
 		t.Error("Default output should not contain difficulty")
 	}
@@ -264,7 +251,6 @@ func TestPrintDistribution_VerboseMode(t *testing.T) {
 	PrintDistribution(&buf, people, PrintOptions{Verbose: true})
 	output := buf.String()
 
-	// Should contain all information
 	if !strings.Contains(output, "Earns: $5") {
 		t.Error("Verbose output should contain earnings")
 	}
@@ -283,7 +269,7 @@ func TestPrintDistribution_VerboseNoCapacity(t *testing.T) {
 	people := []models.Person{
 		{
 			Name:            "Bob",
-			EffortCapacity:  0, // No capacity limit
+			EffortCapacity:  0, 
 			Chores:          []models.Chore{{Name: "Kitchen", Difficulty: 6, Earned: 5}},
 			TotalDifficulty: 6,
 			TotalEarned:     5,
@@ -294,7 +280,6 @@ func TestPrintDistribution_VerboseNoCapacity(t *testing.T) {
 	PrintDistribution(&buf, people, PrintOptions{Verbose: true})
 	output := buf.String()
 
-	// Should show difficulty but not capacity limit
 	if !strings.Contains(output, "Total Difficulty: 6") {
 		t.Error("Verbose output should contain total difficulty")
 	}
@@ -306,7 +291,6 @@ func TestPrintDistribution_VerboseNoCapacity(t *testing.T) {
 	}
 }
 
-// Helper function
 func abs(x int) int {
 	if x < 0 {
 		return -x

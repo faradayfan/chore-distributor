@@ -21,7 +21,6 @@ func TestFormatMessage_Default(t *testing.T) {
 
 	message := formatMessage(person, false)
 
-	// Should contain name and chore
 	if !strings.Contains(message, "Hi Alice!") {
 		t.Error("Message should contain greeting with name")
 	}
@@ -35,7 +34,6 @@ func TestFormatMessage_Default(t *testing.T) {
 		t.Error("Message should contain total earned")
 	}
 
-	// Should NOT contain difficulty info in default mode
 	if strings.Contains(message, "Difficulty:") {
 		t.Error("Default message should not contain difficulty")
 	}
@@ -59,7 +57,6 @@ func TestFormatMessage_Verbose(t *testing.T) {
 
 	message := formatMessage(person, true)
 
-	// Should contain all info in verbose mode
 	if !strings.Contains(message, "Difficulty: 6") {
 		t.Error("Verbose message should contain difficulty")
 	}
@@ -72,7 +69,7 @@ func TestFormatMessage_VerboseNoCapacity(t *testing.T) {
 	person := models.Person{
 		Name:            "Charlie",
 		Contact:         "charlie@gmail.com",
-		EffortCapacity:  0, // No capacity limit
+		EffortCapacity:  0, 
 		TotalDifficulty: 10,
 		TotalEarned:     8,
 		Chores: []models.Chore{
@@ -82,7 +79,6 @@ func TestFormatMessage_VerboseNoCapacity(t *testing.T) {
 
 	message := formatMessage(person, true)
 
-	// Should show difficulty but not effort line when capacity is 0
 	if !strings.Contains(message, "Difficulty:") {
 		t.Error("Verbose message should contain difficulty")
 	}
@@ -105,7 +101,6 @@ func TestFormatMessage_MultipleChores(t *testing.T) {
 
 	message := formatMessage(person, false)
 
-	// Should contain all chores
 	if !strings.Contains(message, "Kitchen") {
 		t.Error("Message should contain Kitchen")
 	}
@@ -133,7 +128,6 @@ func TestNewSender(t *testing.T) {
 }
 
 func TestFormatMessage_EmailContact(t *testing.T) {
-	// Test that email contacts work the same as phone numbers
 	person := models.Person{
 		Name:        "Dad",
 		Contact:     "dad@icloud.com",

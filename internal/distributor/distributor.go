@@ -9,22 +9,18 @@ import (
 	"github.com/faradayfan/chore-distributor/internal/models"
 )
 
-// PrintOptions controls what information is displayed in the output
 type PrintOptions struct {
-	Verbose bool // Show difficulty and capacity information
+	Verbose bool 
 }
 
-// Distribute assigns chores to people based on earning balance and capacity limits
 func Distribute(chores []models.Chore, people []models.Person) []models.Person {
 	sortedChores := make([]models.Chore, len(chores))
 	copy(sortedChores, chores)
 
-	// Shuffle for randomization
 	rand.Shuffle(len(sortedChores), func(i, j int) {
 		sortedChores[i], sortedChores[j] = sortedChores[j], sortedChores[i]
 	})
 
-	// Sort by earned (highest first) with stable sort to preserve shuffle order for ties
 	sort.SliceStable(sortedChores, func(i, j int) bool {
 		return sortedChores[i].Earned > sortedChores[j].Earned
 	})
@@ -64,7 +60,6 @@ func Distribute(chores []models.Chore, people []models.Person) []models.Person {
 	return people
 }
 
-// PrintDistribution outputs the chore distribution to the given writer
 func PrintDistribution(w io.Writer, people []models.Person, opts PrintOptions) {
 	fmt.Fprintf(w, "\n=== Chore Distribution ===\n\n")
 

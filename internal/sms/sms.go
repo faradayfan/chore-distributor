@@ -9,17 +9,14 @@ import (
 	"github.com/faradayfan/chore-distributor/internal/models"
 )
 
-// Sender handles sending messages via iMessage
 type Sender struct {
-	DryRun bool // If true, print messages instead of sending
+	DryRun bool 
 }
 
-// NewSender creates a new message sender
 func NewSender(dryRun bool) *Sender {
 	return &Sender{DryRun: dryRun}
 }
 
-// SendChoreAssignments sends each person their chore assignments via iMessage
 func (s *Sender) SendChoreAssignments(people []models.Person, verbose bool) error {
 	if runtime.GOOS != "darwin" && !s.DryRun {
 		return fmt.Errorf("iMessage is only supported on macOS")
@@ -54,7 +51,6 @@ func (s *Sender) SendChoreAssignments(people []models.Person, verbose bool) erro
 	return nil
 }
 
-// formatMessage creates the iMessage content for a person
 func formatMessage(person models.Person, verbose bool) string {
 	var sb strings.Builder
 
@@ -79,10 +75,7 @@ func formatMessage(person models.Person, verbose bool) string {
 	return sb.String()
 }
 
-// sendViaMessages sends a message using macOS Messages app via AppleScript
-// The contact can be a phone number (e.g., "+15551234567") or an Apple ID email (e.g., "user@icloud.com")
 func sendViaMessages(contact, message string) error {
-	// Escape special characters for AppleScript
 	escapedMessage := strings.ReplaceAll(message, `\`, `\\`)
 	escapedMessage = strings.ReplaceAll(escapedMessage, `"`, `\"`)
 
@@ -103,7 +96,6 @@ end tell
 	return nil
 }
 
-// IsSupported checks if iMessage sending is supported on this platform
 func IsSupported() bool {
 	return runtime.GOOS == "darwin"
 }

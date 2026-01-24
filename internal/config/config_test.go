@@ -6,7 +6,6 @@ import (
 )
 
 func TestLoad_ValidFile(t *testing.T) {
-	// Create a temporary config file
 	configContent := `{
   "chores": [
     {"Name": "Kitchen", "Difficulty": 6, "Earned": 5},
@@ -31,13 +30,11 @@ func TestLoad_ValidFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Load the config
 	config, err := Load(tmpfile.Name())
 	if err != nil {
 		t.Fatalf("Failed to load config: %v", err)
 	}
 
-	// Verify chores
 	if len(config.Chores) != 2 {
 		t.Errorf("Expected 2 chores, got %d", len(config.Chores))
 	}
@@ -46,7 +43,6 @@ func TestLoad_ValidFile(t *testing.T) {
 		t.Errorf("Expected first chore to be 'Kitchen', got '%s'", config.Chores[0].Name)
 	}
 
-	// Verify people
 	if len(config.People) != 2 {
 		t.Errorf("Expected 2 people, got %d", len(config.People))
 	}
@@ -59,7 +55,6 @@ func TestLoad_ValidFile(t *testing.T) {
 		t.Errorf("Expected Bob's capacity to be 15, got %d", config.People[1].EffortCapacity)
 	}
 
-	// Verify chores slices are initialized
 	for i, person := range config.People {
 		if person.Chores == nil {
 			t.Errorf("Person %d (%s) has nil Chores slice", i, person.Name)
@@ -75,7 +70,6 @@ func TestLoad_FileNotFound(t *testing.T) {
 }
 
 func TestLoad_InvalidJSON(t *testing.T) {
-	// Create a temporary file with invalid JSON
 	tmpfile, err := os.CreateTemp("", "test_invalid_*.json")
 	if err != nil {
 		t.Fatal(err)
@@ -90,7 +84,6 @@ func TestLoad_InvalidJSON(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Try to load the invalid config
 	_, err = Load(tmpfile.Name())
 	if err == nil {
 		t.Error("Expected error when loading invalid JSON, got nil")

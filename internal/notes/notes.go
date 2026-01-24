@@ -10,13 +10,11 @@ import (
 	"github.com/faradayfan/chore-distributor/internal/models"
 )
 
-// Writer handles writing to Apple Notes
 type Writer struct {
 	DryRun   bool
 	NoteName string
 }
 
-// NewWriter creates a new Apple Notes writer
 func NewWriter(noteName string, dryRun bool) *Writer {
 	return &Writer{
 		NoteName: noteName,
@@ -24,7 +22,6 @@ func NewWriter(noteName string, dryRun bool) *Writer {
 	}
 }
 
-// PrependChoreList adds the chore distribution to the specified Apple Note
 func (w *Writer) PrependChoreList(people []models.Person, verbose bool) error {
 	if runtime.GOOS != "darwin" && !w.DryRun {
 		return fmt.Errorf("Apple Notes is only supported on macOS")
@@ -45,24 +42,20 @@ func (w *Writer) PrependChoreList(people []models.Person, verbose bool) error {
 	return nil
 }
 
-// formatNoteContentHTML creates HTML content for Apple Notes
 func formatNoteContentHTML(people []models.Person, verbose bool) string {
 	var sb strings.Builder
 
-	// Date header
 	dateStr := time.Now().Format("Monday, January 2, 2006")
 	sb.WriteString(fmt.Sprintf("<div><b>%s</b></div>", dateStr))
 	sb.WriteString("<div><br></div>")
 
 	for _, person := range people {
-		// Person name
 		if verbose && person.EffortCapacity > 0 {
 			sb.WriteString(fmt.Sprintf("<div><b>%s</b> (Capacity: %d)</div>", person.Name, person.EffortCapacity))
 		} else {
 			sb.WriteString(fmt.Sprintf("<div><b>%s</b></div>", person.Name))
 		}
 
-		// Chores
 		for _, chore := range person.Chores {
 			if verbose {
 				sb.WriteString(fmt.Sprintf("<div>• %s (Difficulty: %d, Earns: $%d)</div>",
@@ -73,7 +66,6 @@ func formatNoteContentHTML(people []models.Person, verbose bool) string {
 			}
 		}
 
-		// Totals
 		if verbose && person.EffortCapacity > 0 {
 			sb.WriteString(fmt.Sprintf("<div>Total: $%d | Effort: %d / %d</div>",
 				person.TotalEarned, person.TotalDifficulty, person.EffortCapacity))
@@ -83,14 +75,12 @@ func formatNoteContentHTML(people []models.Person, verbose bool) string {
 		sb.WriteString("<div><br></div>")
 	}
 
-	// Separator
 	sb.WriteString("<div>─────────────────────</div>")
 	sb.WriteString("<div><br></div>")
 
 	return sb.String()
 }
 
-// formatNoteContentPlain creates plain text content for dry-run preview
 func formatNoteContentPlain(people []models.Person, verbose bool) string {
 	var sb strings.Builder
 
@@ -127,7 +117,6 @@ func formatNoteContentPlain(people []models.Person, verbose bool) string {
 	return sb.String()
 }
 
-// updateNote finds the note, removes first line, then rebuilds with: title + new content + old content
 func updateNote(noteName, newContent string) error {
 	escapedContent := strings.ReplaceAll(newContent, `\`, `\\`)
 	escapedContent = strings.ReplaceAll(escapedContent, `"`, `\"`)
@@ -179,7 +168,6 @@ end tell
 	return nil
 }
 
-// IsSupported checks if Apple Notes is supported on this platform
 func IsSupported() bool {
 	return runtime.GOOS == "darwin"
 }
