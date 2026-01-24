@@ -1,0 +1,52 @@
+{
+  "chores": [
+    {
+      "Name": "Family Room",
+      "Difficulty": 3,
+      "Earned": 2
+    },
+    {
+      "Name": "Living Room",
+      "Difficulty": 4,
+      "Earned": 3
+    },
+    {
+      "Name": "Kitchen",
+      "Difficulty": 6,
+      "Earned": 5
+    },
+    {
+      "Name": "Dinning Room",
+      "Difficulty": 4,
+      "Earned": 3
+    },
+    {
+      "Name": "Mud Room",
+      "Difficulty": 3,
+      "Earned": 2
+    },
+    {
+      "Name": "Bathroom",
+      "Difficulty": 5,
+      "Earned": 4
+    }
+  ],
+  "people": [
+    {
+      "Name": "Jeff",
+      "EffortCapacity": 0
+    },
+    {
+      "Name": "John",
+      "EffortCapacity": 0
+    },
+    {
+      "Name": "Kristen",
+      "EffortCapacity": 5
+    },
+    {
+      "Name": "Tommy",
+      "EffortCapacity": 3
+    }
+  ]
+}
