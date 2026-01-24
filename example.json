@@ -34,19 +34,23 @@
   "people": [
     {
       "Name": "Jeff",
-      "EffortCapacity": 0
+      "EffortCapacity": 0,
+      "Contact": ""
     },
     {
       "Name": "John",
-      "EffortCapacity": 0
+      "EffortCapacity": 0,
+      "Contact": ""
     },
     {
       "Name": "Kristen",
-      "EffortCapacity": 5
+      "EffortCapacity": 5,
+      "Contact": ""
     },
     {
       "Name": "Tommy",
-      "EffortCapacity": 3
+      "EffortCapacity": 3,
+      "Contact": ""
     }
   ]
 }
