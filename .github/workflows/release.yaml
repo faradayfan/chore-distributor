@@ -1,0 +1,68 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    name: Release Please
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      version: ${{ steps.release.outputs.version }}
+    steps:
+      - name: Run release-please
+        id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          release-type: go
+
+  build-and-publish:
+    name: Build and Publish
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          # macOS only - iMessage and Apple Notes require macOS
+          - goos: darwin
+            goarch: amd64
+            name: chore-distributor-darwin-amd64
+          - goos: darwin
+            goarch: arm64
+            name: chore-distributor-darwin-arm64
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Build binary
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+        run: |
+          go build -ldflags "-X github.com/faradayfan/chore-distributor/cmd/chore-distributor/cmd.Version=${{ needs.release-please.outputs.version }} \
+            -X github.com/faradayfan/chore-distributor/cmd/chore-distributor/cmd.CommitSHA=${{ github.sha }} \
+            -X github.com/faradayfan/chore-distributor/cmd/chore-distributor/cmd.BuildDate=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            -o ${{ matrix.name }}-${{ needs.release-please.outputs.version }} ./main.go
+
+      - name: Upload release artifact
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.release-please.outputs.tag_name }}
+          files: ${{ matrix.name }}-${{ needs.release-please.outputs.version }}
