@@ -28,4 +28,4 @@ jobs:
         run: go test ./... -v -cover
 
       - name: Build
-        run: go build -o chore-distributor ./cmd/chore-distributor
+        run: go build -o chore-distributor ./main.go
