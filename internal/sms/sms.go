@@ -60,9 +60,15 @@ func formatMessage(person models.Person, verbose bool) string {
 		if verbose {
 			sb.WriteString(fmt.Sprintf("• %s (Difficulty: %d, Earns: $%d)\n",
 				chore.Name, chore.Difficulty, chore.Earned))
+			if chore.Description != "" {
+				sb.WriteString(fmt.Sprintf("  %s\n", chore.Description))
+			}
 		} else {
 			sb.WriteString(fmt.Sprintf("• %s (Earns: $%d)\n",
 				chore.Name, chore.Earned))
+			if chore.Description != "" {
+				sb.WriteString(fmt.Sprintf("  %s\n", chore.Description))
+			}
 		}
 	}
 

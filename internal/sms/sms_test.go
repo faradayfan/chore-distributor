@@ -146,3 +146,52 @@ func TestFormatMessage_EmailContact(t *testing.T) {
 		t.Error("Message should contain chore")
 	}
 }
+
+func TestFormatMessage_WithDescription(t *testing.T) {
+	person := models.Person{
+		Name:            "Alice",
+		Contact:         "+1234567890",
+		TotalEarned:     9,
+		Chores: []models.Chore{
+			{Name: "Kitchen", Difficulty: 6, Earned: 5, Description: "Clean counters, sink, and floors"},
+			{Name: "Bathroom", Difficulty: 5, Earned: 4, Description: ""},
+		},
+	}
+
+	message := formatMessage(person, false)
+
+	if !strings.Contains(message, "Kitchen") {
+		t.Error("Message should contain chore name")
+	}
+	if !strings.Contains(message, "Clean counters, sink, and floors") {
+		t.Error("Message should contain description")
+	}
+	if !strings.Contains(message, "Bathroom") {
+		t.Error("Message should contain second chore")
+	}
+}
+
+func TestFormatMessage_VerboseWithDescription(t *testing.T) {
+	person := models.Person{
+		Name:            "Bob",
+		Contact:         "bob@icloud.com",
+		EffortCapacity:  15,
+		TotalDifficulty: 4,
+		TotalEarned:     3,
+		Chores: []models.Chore{
+			{Name: "Living Room", Difficulty: 4, Earned: 3, Description: "Vacuum and dust"},
+		},
+	}
+
+	message := formatMessage(person, true)
+
+	if !strings.Contains(message, "Living Room") {
+		t.Error("Message should contain chore name")
+	}
+	if !strings.Contains(message, "Difficulty: 4") {
+		t.Error("Verbose message should contain difficulty")
+	}
+	if !strings.Contains(message, "Vacuum and dust") {
+		t.Error("Message should contain description")
+	}
+}

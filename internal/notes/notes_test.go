@@ -315,3 +315,111 @@ func TestFormatNoteContentHTML_EmptyChores(t *testing.T) {
 func TestIsSupported(t *testing.T) {
 	_ = IsSupported()
 }
+
+func TestFormatNoteContentHTML_WithDescription(t *testing.T) {
+	people := []models.Person{
+		{
+			Name:        "Alice",
+			TotalEarned: 9,
+			Chores: []models.Chore{
+				{Name: "Kitchen", Difficulty: 6, Earned: 5, Description: "Clean counters, sink, and floors"},
+				{Name: "Bathroom", Difficulty: 5, Earned: 4, Description: ""},
+			},
+		},
+	}
+
+	content := formatNoteContentHTML(people, false)
+
+	if !strings.Contains(content, "• Kitchen") {
+		t.Error("Content should contain chore name")
+	}
+	if !strings.Contains(content, "Clean counters, sink, and floors") {
+		t.Error("Content should contain description")
+	}
+	if !strings.Contains(content, "padding-left: 20px") {
+		t.Error("Description should have padding style")
+	}
+	if !strings.Contains(content, "color: #666") {
+		t.Error("Description should have gray color")
+	}
+	if !strings.Contains(content, "Bathroom") {
+		t.Error("Content should contain second chore")
+	}
+}
+
+func TestFormatNoteContentHTML_VerboseWithDescription(t *testing.T) {
+	people := []models.Person{
+		{
+			Name:            "Bob",
+			EffortCapacity:  15,
+			TotalDifficulty: 4,
+			TotalEarned:     3,
+			Chores: []models.Chore{
+				{Name: "Living Room", Difficulty: 4, Earned: 3, Description: "Vacuum and dust"},
+			},
+		},
+	}
+
+	content := formatNoteContentHTML(people, true)
+
+	if !strings.Contains(content, "Living Room") {
+		t.Error("Content should contain chore name")
+	}
+	if !strings.Contains(content, "Difficulty: 4") {
+		t.Error("Verbose content should contain difficulty")
+	}
+	if !strings.Contains(content, "Vacuum and dust") {
+		t.Error("Content should contain description")
+	}
+}
+
+func TestFormatNoteContentPlain_WithDescription(t *testing.T) {
+	people := []models.Person{
+		{
+			Name:        "Alice",
+			TotalEarned: 9,
+			Chores: []models.Chore{
+				{Name: "Kitchen", Difficulty: 6, Earned: 5, Description: "Clean counters, sink, and floors"},
+				{Name: "Bathroom", Difficulty: 5, Earned: 4, Description: ""},
+			},
+		},
+	}
+
+	content := formatNoteContentPlain(people, false)
+
+	if !strings.Contains(content, "• Kitchen") {
+		t.Error("Content should contain chore name")
+	}
+	if !strings.Contains(content, "Clean counters, sink, and floors") {
+		t.Error("Content should contain description")
+	}
+	if !strings.Contains(content, "Bathroom") {
+		t.Error("Content should contain second chore")
+	}
+}
+
+func TestFormatNoteContentPlain_VerboseWithDescription(t *testing.T) {
+	people := []models.Person{
+		{
+			Name:            "Bob",
+			EffortCapacity:  15,
+			TotalDifficulty: 4,
+			TotalEarned:     3,
+			Chores: []models.Chore{
+				{Name: "Living Room", Difficulty: 4, Earned: 3, Description: "Vacuum and dust"},
+			},
+		},
+	}
+
+	content := formatNoteContentPlain(people, true)
+
+	if !strings.Contains(content, "Living Room") {
+		t.Error("Content should contain chore name")
+	}
+	if !strings.Contains(content, "Difficulty: 4") {
+		t.Error("Verbose content should contain difficulty")
+	}
+	if !strings.Contains(content, "Vacuum and dust") {
+		t.Error("Content should contain description")
+	}
+}

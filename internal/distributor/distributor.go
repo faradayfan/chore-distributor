@@ -74,9 +74,15 @@ func PrintDistribution(w io.Writer, people []models.Person, opts PrintOptions) {
 			if opts.Verbose {
 				fmt.Fprintf(w, "    - %s (Difficulty: %d, Earns: $%d)\n",
 					chore.Name, chore.Difficulty, chore.Earned)
+				if chore.Description != "" {
+					fmt.Fprintf(w, "      %s\n", chore.Description)
+				}
 			} else {
 				fmt.Fprintf(w, "    - %s (Earns: $%d)\n",
 					chore.Name, chore.Earned)
+				if chore.Description != "" {
+					fmt.Fprintf(w, "      %s\n", chore.Description)
+				}
 			}
 		}
 		if opts.Verbose {

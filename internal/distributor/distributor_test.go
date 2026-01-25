@@ -291,6 +291,77 @@ func TestPrintDistribution_VerboseNoCapacity(t *testing.T) {
 	}
 }
 
+func TestPrintDistribution_WithDescription(t *testing.T) {
+	people := []models.Person{
+		{
+			Name:            "Alice",
+			EffortCapacity:  10,
+			Chores:          []models.Chore{
+				{Name: "Kitchen", Difficulty: 6, Earned: 5, Description: "Clean counters, sink, and floors"},
+				{Name: "Bathroom", Difficulty: 5, Earned: 4, Description: ""},
+			},
+			TotalDifficulty: 11,
+			TotalEarned:     9,
+		},
+	}
+
+	var buf bytes.Buffer
+	PrintDistribution(&buf, people, PrintOptions{Verbose: false})
+	output := buf.String()
+
+	if !strings.Contains(output, "Kitchen") {
+		t.Error("Output should contain chore name")
+	}
+	if !strings.Contains(output, "Clean counters, sink, and floors") {
+		t.Error("Output should contain description")
+	}
+	if !strings.Contains(output, "Bathroom") {
+		t.Error("Output should contain second chore")
+	}
+
+	lines := strings.Split(output, "\n")
+	foundKitchen := false
+	for i, line := range lines {
+		if strings.Contains(line, "Kitchen") {
+			foundKitchen = true
+			if i+1 < len(lines) && !strings.Contains(lines[i+1], "Clean counters") {
+				t.Error("Description should appear on line immediately after chore")
+			}
+		}
+	}
+	if !foundKitchen {
+		t.Error("Could not find Kitchen chore in output")
+	}
+}
+
+func TestPrintDistribution_VerboseWithDescription(t *testing.T) {
+	people := []models.Person{
+		{
+			Name:            "Bob",
+			EffortCapacity:  15,
+			Chores:          []models.Chore{
+				{Name: "Living Room", Difficulty: 4, Earned: 3, Description: "Vacuum and dust"},
+			},
+			TotalDifficulty: 4,
+			TotalEarned:     3,
+		},
+	}
+
+	var buf bytes.Buffer
+	PrintDistribution(&buf, people, PrintOptions{Verbose: true})
+	output := buf.String()
+
+	if !strings.Contains(output, "Living Room") {
+		t.Error("Output should contain chore name")
+	}
+	if !strings.Contains(output, "Difficulty: 4") {
+		t.Error("Verbose output should contain difficulty")
+	}
+	if !strings.Contains(output, "Vacuum and dust") {
+		t.Error("Output should contain description")
+	}
+}
+
 func abs(x int) int {
 	if x < 0 {
 		return -x

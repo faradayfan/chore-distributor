@@ -1,9 +1,10 @@
 package models
 
 type Chore struct {
-	Name       string `json:"Name"`
-	Difficulty int    `json:"Difficulty"`
-	Earned     int    `json:"Earned"`
+	Name        string `json:"Name"`
+	Difficulty  int    `json:"Difficulty"`
+	Earned      int    `json:"Earned"`
+	Description string `json:"Description,omitempty"`
 }
 
 type Person struct {

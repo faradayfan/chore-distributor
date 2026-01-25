@@ -3,7 +3,8 @@
     {
       "Name": "Family Room",
       "Difficulty": 3,
-      "Earned": 2
+      "Earned": 2,
+      "Description": "Vacuum carpet and dust surfaces"
     },
     {
       "Name": "Living Room",
@@ -13,7 +14,8 @@
     {
       "Name": "Kitchen",
       "Difficulty": 6,
-      "Earned": 5
+      "Earned": 5,
+      "Description": "Clean counters, sink, load/unload dishwasher, sweep floor"
     },
     {
       "Name": "Dinning Room",
@@ -28,7 +30,8 @@
     {
       "Name": "Bathroom",
       "Difficulty": 5,
-      "Earned": 4
+      "Earned": 4,
+      "Description": "Clean toilet, sink, mirror, and floor"
     }
   ],
   "people": [
