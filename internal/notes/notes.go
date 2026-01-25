@@ -56,6 +56,25 @@ func formatNoteContentHTML(people []models.Person, verbose bool) string {
 			sb.WriteString(fmt.Sprintf("<div><b>%s</b></div>", person.Name))
 		}
 
+		// Add pre-assigned chores first
+		for _, chore := range person.PreAssignedChores {
+			if verbose {
+				sb.WriteString(fmt.Sprintf("<div>• %s (Difficulty: %d, Earns: $%d)</div>",
+					chore.Name, chore.Difficulty, chore.Earned))
+				if chore.Description != "" {
+					sb.WriteString(fmt.Sprintf("<div style=\"padding-left: 20px; color: #666;\">%s</div>",
+						chore.Description))
+				}
+			} else {
+				sb.WriteString(fmt.Sprintf("<div>• %s — $%d</div>",
+					chore.Name, chore.Earned))
+				if chore.Description != "" {
+					sb.WriteString(fmt.Sprintf("<div style=\"padding-left: 20px; color: #666;\">%s</div>",
+						chore.Description))
+				}
+			}
+		}
+		// Then add distributed chores
 		for _, chore := range person.Chores {
 			if verbose {
 				sb.WriteString(fmt.Sprintf("<div>• %s (Difficulty: %d, Earns: $%d)</div>",
@@ -102,6 +121,23 @@ func formatNoteContentPlain(people []models.Person, verbose bool) string {
 			sb.WriteString(fmt.Sprintf("%s\n", person.Name))
 		}
 
+		// Add pre-assigned chores first
+		for _, chore := range person.PreAssignedChores {
+			if verbose {
+				sb.WriteString(fmt.Sprintf("  • %s (Difficulty: %d, Earns: $%d)\n",
+					chore.Name, chore.Difficulty, chore.Earned))
+				if chore.Description != "" {
+					sb.WriteString(fmt.Sprintf("    %s\n", chore.Description))
+				}
+			} else {
+				sb.WriteString(fmt.Sprintf("  • %s — $%d\n",
+					chore.Name, chore.Earned))
+				if chore.Description != "" {
+					sb.WriteString(fmt.Sprintf("    %s\n", chore.Description))
+				}
+			}
+		}
+		// Then add distributed chores
 		for _, chore := range person.Chores {
 			if verbose {
 				sb.WriteString(fmt.Sprintf("  • %s (Difficulty: %d, Earns: $%d)\n",

@@ -362,6 +362,47 @@ func TestPrintDistribution_VerboseWithDescription(t *testing.T) {
 	}
 }
 
+func TestPrintDistribution_WithPreAssignedChores(t *testing.T) {
+	people := []models.Person{
+		{
+			Name:            "Tommy",
+			EffortCapacity:  10,
+			PreAssignedChores: []models.Chore{
+				{Name: "Clean Bedroom", Difficulty: 2, Earned: 2, Description: "Personal bedroom"},
+			},
+			Chores:          []models.Chore{
+				{Name: "Kitchen", Difficulty: 6, Earned: 5},
+			},
+			TotalDifficulty: 8,
+			TotalEarned:     7,
+		},
+	}
+
+	var buf bytes.Buffer
+	PrintDistribution(&buf, people, PrintOptions{Verbose: false})
+	output := buf.String()
+
+	if !strings.Contains(output, "Clean Bedroom") {
+		t.Error("Output should contain pre-assigned chore")
+	}
+	if !strings.Contains(output, "Kitchen") {
+		t.Error("Output should contain distributed chore")
+	}
+	if !strings.Contains(output, "Total Earned: $7") {
+		t.Error("Total should include both pre-assigned and distributed chores")
+	}
+
+	// Verify pre-assigned chore comes before distributed chore
+	cleanIdx := strings.Index(output, "Clean Bedroom")
+	kitchenIdx := strings.Index(output, "Kitchen")
+	if cleanIdx == -1 || kitchenIdx == -1 {
+		t.Error("Both chores should be in output")
+	}
+	if cleanIdx > kitchenIdx {
+		t.Error("Pre-assigned chore should appear before distributed chore")
+	}
+}
+
 func abs(x int) int {
 	if x < 0 {
 		return -x

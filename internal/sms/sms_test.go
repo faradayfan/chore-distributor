@@ -195,3 +195,39 @@ func TestFormatMessage_VerboseWithDescription(t *testing.T) {
 		t.Error("Message should contain description")
 	}
 }
+
+func TestFormatMessage_WithPreAssignedChores(t *testing.T) {
+	person := models.Person{
+		Name:        "Tommy",
+		Contact:     "+1234567890",
+		TotalEarned: 7,
+		PreAssignedChores: []models.Chore{
+			{Name: "Clean Bedroom", Difficulty: 2, Earned: 2, Description: "Personal bedroom"},
+		},
+		Chores: []models.Chore{
+			{Name: "Kitchen", Difficulty: 6, Earned: 5},
+		},
+	}
+
+	message := formatMessage(person, false)
+
+	if !strings.Contains(message, "Clean Bedroom") {
+		t.Error("Message should contain pre-assigned chore")
+	}
+	if !strings.Contains(message, "Kitchen") {
+		t.Error("Message should contain distributed chore")
+	}
+	if !strings.Contains(message, "Total: $7") {
+		t.Error("Total should include both chore types")
+	}
+
+	// Verify pre-assigned chore comes first
+	cleanIdx := strings.Index(message, "Clean Bedroom")
+	kitchenIdx := strings.Index(message, "Kitchen")
+	if cleanIdx == -1 || kitchenIdx == -1 {
+		t.Error("Both chores should be in message")
+	}
+	if cleanIdx > kitchenIdx {
+		t.Error("Pre-assigned chore should appear before distributed chore")
+	}
+}

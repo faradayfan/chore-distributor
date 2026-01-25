@@ -423,3 +423,74 @@ func TestFormatNoteContentPlain_VerboseWithDescription(t *testing.T) {
 		t.Error("Content should contain description")
 	}
 }
+
+func TestFormatNoteContentHTML_WithPreAssignedChores(t *testing.T) {
+	people := []models.Person{
+		{
+			Name:        "Tommy",
+			TotalEarned: 7,
+			PreAssignedChores: []models.Chore{
+				{Name: "Clean Bedroom", Difficulty: 2, Earned: 2, Description: "Personal bedroom"},
+			},
+			Chores: []models.Chore{
+				{Name: "Kitchen", Difficulty: 6, Earned: 5},
+			},
+		},
+	}
+
+	content := formatNoteContentHTML(people, false)
+
+	if !strings.Contains(content, "Clean Bedroom") {
+		t.Error("Content should contain pre-assigned chore")
+	}
+	if !strings.Contains(content, "Kitchen") {
+		t.Error("Content should contain distributed chore")
+	}
+	if !strings.Contains(content, "Total: $7") {
+		t.Error("Total should include both chore types")
+	}
+
+	// Verify pre-assigned chore comes first
+	cleanIdx := strings.Index(content, "Clean Bedroom")
+	kitchenIdx := strings.Index(content, "Kitchen")
+	if cleanIdx == -1 || kitchenIdx == -1 {
+		t.Error("Both chores should be in content")
+	}
+	if cleanIdx > kitchenIdx {
+		t.Error("Pre-assigned chore should appear before distributed chore")
+	}
+}
+
+func TestFormatNoteContentPlain_WithPreAssignedChores(t *testing.T) {
+	people := []models.Person{
+		{
+			Name:        "Tommy",
+			TotalEarned: 7,
+			PreAssignedChores: []models.Chore{
+				{Name: "Clean Bedroom", Difficulty: 2, Earned: 2},
+			},
+			Chores: []models.Chore{
+				{Name: "Kitchen", Difficulty: 6, Earned: 5},
+			},
+		},
+	}
+
+	content := formatNoteContentPlain(people, false)
+
+	if !strings.Contains(content, "Clean Bedroom") {
+		t.Error("Content should contain pre-assigned chore")
+	}
+	if !strings.Contains(content, "Kitchen") {
+		t.Error("Content should contain distributed chore")
+	}
+
+	// Verify pre-assigned chore comes first
+	cleanIdx := strings.Index(content, "Clean Bedroom")
+	kitchenIdx := strings.Index(content, "Kitchen")
+	if cleanIdx == -1 || kitchenIdx == -1 {
+		t.Error("Both chores should be in content")
+	}
+	if cleanIdx > kitchenIdx {
+		t.Error("Pre-assigned chore should appear before distributed chore")
+	}
+}

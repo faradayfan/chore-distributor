@@ -70,6 +70,23 @@ func PrintDistribution(w io.Writer, people []models.Person, opts PrintOptions) {
 		}
 		fmt.Fprintln(w, ":")
 		fmt.Fprintln(w, "  Chores:")
+		// Print pre-assigned chores first
+		for _, chore := range person.PreAssignedChores {
+			if opts.Verbose {
+				fmt.Fprintf(w, "    - %s (Difficulty: %d, Earns: $%d)\n",
+					chore.Name, chore.Difficulty, chore.Earned)
+				if chore.Description != "" {
+					fmt.Fprintf(w, "      %s\n", chore.Description)
+				}
+			} else {
+				fmt.Fprintf(w, "    - %s (Earns: $%d)\n",
+					chore.Name, chore.Earned)
+				if chore.Description != "" {
+					fmt.Fprintf(w, "      %s\n", chore.Description)
+				}
+			}
+		}
+		// Then print distributed chores
 		for _, chore := range person.Chores {
 			if opts.Verbose {
 				fmt.Fprintf(w, "    - %s (Difficulty: %d, Earns: $%d)\n",

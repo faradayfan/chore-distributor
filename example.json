@@ -53,7 +53,15 @@
     {
       "Name": "Tommy",
       "EffortCapacity": 3,
-      "Contact": ""
+      "Contact": "",
+      "PreAssignedChores": [
+        {
+          "Name": "Clean Bedroom",
+          "Difficulty": 1,
+          "Earned": 1,
+          "Description": "Clean and organize personal bedroom"
+        }
+      ]
     }
   ]
 }

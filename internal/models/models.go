@@ -8,12 +8,13 @@ type Chore struct {
 }
 
 type Person struct {
-	Name            string  `json:"Name"`
-	Contact         string  `json:"Contact,omitempty"` 
-	EffortCapacity  int     `json:"EffortCapacity"`    
-	Chores          []Chore `json:"-"`
-	TotalDifficulty int     `json:"-"`
-	TotalEarned     int     `json:"-"`
+	Name              string  `json:"Name"`
+	Contact           string  `json:"Contact,omitempty"`
+	EffortCapacity    int     `json:"EffortCapacity"`
+	PreAssignedChores []Chore `json:"PreAssignedChores,omitempty"`
+	Chores            []Chore `json:"-"`
+	TotalDifficulty   int     `json:"-"`
+	TotalEarned       int     `json:"-"`
 }
 
 type Config struct {

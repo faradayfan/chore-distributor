@@ -76,6 +76,12 @@ func runDistribute() {
 			cfg.People[i].Chores = []models.Chore{}
 			cfg.People[i].TotalDifficulty = 0
 			cfg.People[i].TotalEarned = 0
+
+			// Recalculate from pre-assigned chores
+			for _, chore := range cfg.People[i].PreAssignedChores {
+				cfg.People[i].TotalDifficulty += chore.Difficulty
+				cfg.People[i].TotalEarned += chore.Earned
+			}
 		}
 
 		cfg.People = distributor.Distribute(cfg.Chores, cfg.People)

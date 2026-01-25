@@ -24,6 +24,12 @@ func Load(filename string) (*models.Config, error) {
 		if config.People[i].Chores == nil {
 			config.People[i].Chores = []models.Chore{}
 		}
+
+		// Initialize totals from pre-assigned chores
+		for _, chore := range config.People[i].PreAssignedChores {
+			config.People[i].TotalDifficulty += chore.Difficulty
+			config.People[i].TotalEarned += chore.Earned
+		}
 	}
 
 	return &config, nil

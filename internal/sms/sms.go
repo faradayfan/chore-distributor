@@ -56,6 +56,23 @@ func formatMessage(person models.Person, verbose bool) string {
 
 	sb.WriteString(fmt.Sprintf("Hi %s! Here are your chores:\n\n", person.Name))
 
+	// Add pre-assigned chores first
+	for _, chore := range person.PreAssignedChores {
+		if verbose {
+			sb.WriteString(fmt.Sprintf("• %s (Difficulty: %d, Earns: $%d)\n",
+				chore.Name, chore.Difficulty, chore.Earned))
+			if chore.Description != "" {
+				sb.WriteString(fmt.Sprintf("  %s\n", chore.Description))
+			}
+		} else {
+			sb.WriteString(fmt.Sprintf("• %s (Earns: $%d)\n",
+				chore.Name, chore.Earned))
+			if chore.Description != "" {
+				sb.WriteString(fmt.Sprintf("  %s\n", chore.Description))
+			}
+		}
+	}
+	// Then add distributed chores
 	for _, chore := range person.Chores {
 		if verbose {
 			sb.WriteString(fmt.Sprintf("• %s (Difficulty: %d, Earns: $%d)\n",
