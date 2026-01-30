@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.0](https://github.com/faradayfan/chore-distributor/compare/v1.1.0...v1.2.0) (2026-01-30)
+
+
+### Features
+
+* Adding notes and sms templating ([3a836ce](https://github.com/faradayfan/chore-distributor/commit/3a836ce24a27cc5a2b30dfb7590ef8dfa6e671b4))
+* Adding schedule sub command ([bd52aae](https://github.com/faradayfan/chore-distributor/commit/bd52aaeb869dd921f7e942388c43b4d002f2a3e4))
+
 ## [1.1.0](https://github.com/faradayfan/chore-distributor/compare/v1.0.0...v1.1.0) (2026-01-25)
 
 
