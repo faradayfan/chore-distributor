@@ -15,12 +15,14 @@ import (
 )
 
 var (
-	configPath string
-	verbose    bool
-	sendSMS    bool
-	noteName   string
-	dryRun     bool
-	confirm    bool
+	configPath        string
+	verbose           bool
+	sendSMS           bool
+	noteName          string
+	dryRun            bool
+	confirm           bool
+	smsTemplatePath   string
+	notesTemplatePath string
 )
 
 var distributeCmd = &cobra.Command{
@@ -113,8 +115,14 @@ func runDistribute() {
 			os.Exit(1)
 		}
 
+		// Use CLI flag if provided, otherwise use config value
+		templatePath := notesTemplatePath
+		if templatePath == "" {
+			templatePath = cfg.NotesTemplatePath
+		}
+
 		fmt.Println("\n--- Saving to Apple Notes ---")
-		writer := notes.NewWriter(noteName, dryRun)
+		writer := notes.NewWriter(noteName, dryRun, templatePath)
 		if err := writer.PrependChoreList(cfg.People, verbose); err != nil {
 			fmt.Fprintf(os.Stderr, "Error saving to Notes: %v\n", err)
 			os.Exit(1)
@@ -127,8 +135,14 @@ func runDistribute() {
 			os.Exit(1)
 		}
 
+		// Use CLI flag if provided, otherwise use config value
+		templatePath := smsTemplatePath
+		if templatePath == "" {
+			templatePath = cfg.SMSTemplatePath
+		}
+
 		fmt.Println("\n--- Sending iMessage Notifications ---")
-		sender := sms.NewSender(dryRun)
+		sender := sms.NewSender(dryRun, templatePath)
 		if err := sender.SendChoreAssignments(cfg.People, verbose); err != nil {
 			fmt.Fprintf(os.Stderr, "Error sending messages: %v\n", err)
 			os.Exit(1)
@@ -177,4 +191,8 @@ func init() {
 		"Prompt for confirmation before sending messages and saving to notes")
 	distributeCmd.Flags().BoolVarP(&dryRun, "dry-run", "n", false,
 		"Preview actions without actually sending messages or saving to notes")
+	distributeCmd.Flags().StringVar(&smsTemplatePath, "sms-template", "",
+		"Path to custom Go template for SMS messages (overrides config file)")
+	distributeCmd.Flags().StringVar(&notesTemplatePath, "notes-template", "",
+		"Path to custom Go template for Apple Notes (overrides config file)")
 }

@@ -54,11 +54,14 @@ Create a JSON configuration file with your chores and family members. See `examp
 
 ```json
 {
+  "smsTemplatePath": "sms-template.txt",
+  "notesTemplatePath": "notes-template.html",
   "chores": [
     {
       "Name": "Kitchen",
       "Difficulty": 6,
-      "Earned": 5
+      "Earned": 5,
+      "Description": "Clean counters, sink, load/unload dishwasher"
     },
     {
       "Name": "Bathroom",
@@ -97,6 +100,17 @@ Create a JSON configuration file with your chores and family members. See `examp
 | `Contact`        | string | Phone number (e.g., `+15551234567`) or Apple ID email (e.g., `user@icloud.com`) for iMessage. Leave empty to skip notifications. |
 | `EffortCapacity` | int    | Maximum total difficulty they can handle. Set to `0` for no limit.                                                               |
 
+### Optional Template Paths
+
+You can customize message formats using Go templates:
+
+| Property            | Type   | Description                                                    |
+| ------------------- | ------ | -------------------------------------------------------------- |
+| `smsTemplatePath`   | string | Path to custom Go template for SMS messages (optional)         |
+| `notesTemplatePath` | string | Path to custom Go template for Apple Notes output (optional)   |
+
+If not specified, the application uses built-in default formatting.
+
 ## Usage
 
 ### Basic Usage
@@ -113,15 +127,17 @@ Distribute chores using the default config file (`chores_config.json`):
 ./chore-distributor distribute [flags]
 ```
 
-| Flag        | Short | Description                                                          |
-| ----------- | ----- | -------------------------------------------------------------------- |
-| `--config`  | `-c`  | Path to the JSON configuration file (default: `chores_config.json`)  |
-| `--verbose` | `-v`  | Show difficulty and capacity information in output                   |
-| `--sms`     | `-s`  | Send iMessage notifications to each person (macOS only)              |
-| `--note`    | `-o`  | Save chore list to an Apple Note with this name (macOS only)         |
-| `--confirm` | `-i`  | Prompt for confirmation before sending messages and saving to notes  |
-| `--dry-run` | `-n`  | Preview actions without actually sending messages or saving to notes |
-| `--help`    | `-h`  | Show help information                                                |
+| Flag               | Short | Description                                                             |
+| ------------------ | ----- | ----------------------------------------------------------------------- |
+| `--config`         | `-c`  | Path to the JSON configuration file (default: `chores_config.json`)    |
+| `--verbose`        | `-v`  | Show difficulty and capacity information in output                      |
+| `--sms`            | `-s`  | Send iMessage notifications to each person (macOS only)                 |
+| `--note`           | `-o`  | Save chore list to an Apple Note with this name (macOS only)            |
+| `--confirm`        | `-i`  | Prompt for confirmation before sending messages and saving to notes     |
+| `--dry-run`        | `-n`  | Preview actions without actually sending messages or saving to notes    |
+| `--sms-template`   |       | Path to custom Go template for SMS messages (overrides config file)    |
+| `--notes-template` |       | Path to custom Go template for Apple Notes (overrides config file)     |
+| `--help`           | `-h`  | Show help information                                                   |
 
 ### Examples
 
@@ -256,6 +272,96 @@ Total: $8
 - An Apple ID email: `alice@icloud.com`
 
 People without a `Contact` configured will be skipped.
+
+## Customizing Message Templates
+
+You can customize the format of SMS and Notes messages using Go templates. This allows you to personalize greetings, change formatting, or add custom information.
+
+### Template Configuration
+
+Templates can be configured in two ways:
+
+1. **Config File**: Add `smsTemplatePath` and `notesTemplatePath` to your JSON config
+2. **CLI Flags**: Use `--sms-template` and `--notes-template` flags (overrides config)
+
+### Available Template Data
+
+Templates have access to the following data for each person:
+
+- `{{.PersonName}}` - The person's name
+- `{{.Contact}}` - Their contact information
+- `{{.Date}}` - Current date/time
+- `{{.TotalEarned}}` - Total earnings (as float)
+- `{{.TotalDifficulty}}` - Total difficulty points
+- `{{.Capacity}}` - Their effort capacity limit
+- `{{.Verbose}}` - Boolean flag from --verbose option
+- `{{.AllChores}}` - Combined list of all chores (pre-assigned + distributed)
+- `{{.PreAssignedChores}}` - List of pre-assigned chores only
+- `{{.DistributedChores}}` - List of distributed chores only
+
+Each chore in the lists has:
+
+- `{{.Name}}` - Chore name
+- `{{.Difficulty}}` - Difficulty value
+- `{{.Earned}}` - Amount earned (as float)
+- `{{.Description}}` - Optional description
+
+### Template Helper Functions
+
+- `currency <amount>` - Format number as currency (e.g., `{{currency .TotalEarned}}` → `$10.00`)
+- `date <format> <time>` - Format date (e.g., `{{date "Monday, January 2" .Date}}`)
+- `pluralize <count> <singular> <plural>` - Pluralize words (e.g., `{{pluralize 1 "chore" "chores"}}`)
+
+### Example SMS Template
+
+Create `sms-template.txt`:
+
+```
+Hi {{.PersonName}}! Here are your chores:
+{{range .AllChores}}
+• {{.Name}} (Earns: {{currency .Earned}}){{if .Description}}
+  {{.Description}}{{end}}
+{{end}}
+Total: {{currency .TotalEarned}}{{if and .Verbose (gt .Capacity 0)}}
+Effort: {{.TotalDifficulty}} / {{.Capacity}}{{end}}
+```
+
+### Example Notes Template
+
+Create `notes-template.html`:
+
+```html
+<div><b>{{date "Monday, January 2, 2006" .Date}}</b></div>
+<div><br></div>
+<div><b>{{.PersonName}}</b>{{if and .Verbose (gt .Capacity 0)}} (Capacity: {{.Capacity}}){{end}}</div>
+{{range .AllChores}}<div>• {{.Name}} — {{currency .Earned}}</div>
+{{if .Description}}<div style="padding-left: 20px; color: #666;">{{.Description}}</div>{{end}}{{end}}
+{{if and .Verbose (gt .Capacity 0)}}<div>Total: {{currency .TotalEarned}} | Effort: {{.TotalDifficulty}} / {{.Capacity}}</div>{{else}}<div>Total: {{currency .TotalEarned}}</div>{{end}}
+<div><br></div>
+<div>─────────────────────</div>
+<div><br></div>
+```
+
+### Using Custom Templates
+
+```bash
+# Use templates specified in config file
+./chore-distributor distribute --config myconfig.json --sms
+
+# Override with CLI flags
+./chore-distributor distribute --sms --sms-template custom-sms.txt
+
+# Test templates with dry-run
+./chore-distributor distribute --sms --sms-template custom-sms.txt --dry-run
+```
+
+### Template Tips
+
+- Use `{{if .Description}}...{{end}}` to conditionally show optional fields
+- Use `{{range .AllChores}}...{{end}}` to loop through chores
+- Use `{{and .Verbose (gt .Capacity 0)}}` for complex conditions
+- For Notes templates, use HTML tags like `<div>`, `<b>`, and inline styles
+- Test templates with `--dry-run` to preview output before sending
 
 ## Project Structure
 

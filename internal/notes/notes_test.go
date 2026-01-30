@@ -9,7 +9,7 @@ import (
 )
 
 func TestNewWriter(t *testing.T) {
-	writer := NewWriter("Test Note", true)
+	writer := NewWriter("Test Note", true, "")
 
 	if writer.NoteName != "Test Note" {
 		t.Errorf("Expected note name 'Test Note', got '%s'", writer.NoteName)
@@ -18,7 +18,7 @@ func TestNewWriter(t *testing.T) {
 		t.Error("Writer should have DryRun set to true")
 	}
 
-	writer = NewWriter("Chores", false)
+	writer = NewWriter("Chores", false, "")
 	if writer.NoteName != "Chores" {
 		t.Errorf("Expected note name 'Chores', got '%s'", writer.NoteName)
 	}

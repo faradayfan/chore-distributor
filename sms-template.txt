@@ -1,0 +1,7 @@
+Hi {{.PersonName}}! Here are your chores:
+{{range .AllChores}}
+• {{.Name}} (Earns: {{currency .Earned}}){{if .Description}}
+  {{.Description}}{{end}}
+{{end}}
+Total: {{currency .TotalEarned}}{{if and .Verbose (gt .Capacity 0)}}
+Effort: {{.TotalDifficulty}} / {{.Capacity}}{{end}}

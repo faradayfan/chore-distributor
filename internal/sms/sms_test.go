@@ -19,7 +19,11 @@ func TestFormatMessage_Default(t *testing.T) {
 		},
 	}
 
-	message := formatMessage(person, false)
+	sender := NewSender(false, "")
+	message, err := sender.formatMessage(person, false)
+	if err != nil {
+		t.Fatalf("formatMessage returned error: %v", err)
+	}
 
 	if !strings.Contains(message, "Hi Alice!") {
 		t.Error("Message should contain greeting with name")
@@ -55,7 +59,11 @@ func TestFormatMessage_Verbose(t *testing.T) {
 		},
 	}
 
-	message := formatMessage(person, true)
+	sender := NewSender(false, "")
+	message, err := sender.formatMessage(person, true)
+	if err != nil {
+		t.Fatalf("formatMessage returned error: %v", err)
+	}
 
 	if !strings.Contains(message, "Difficulty: 6") {
 		t.Error("Verbose message should contain difficulty")
@@ -69,7 +77,7 @@ func TestFormatMessage_VerboseNoCapacity(t *testing.T) {
 	person := models.Person{
 		Name:            "Charlie",
 		Contact:         "charlie@gmail.com",
-		EffortCapacity:  0, 
+		EffortCapacity:  0,
 		TotalDifficulty: 10,
 		TotalEarned:     8,
 		Chores: []models.Chore{
@@ -77,7 +85,11 @@ func TestFormatMessage_VerboseNoCapacity(t *testing.T) {
 		},
 	}
 
-	message := formatMessage(person, true)
+	sender := NewSender(false, "")
+	message, err := sender.formatMessage(person, true)
+	if err != nil {
+		t.Fatalf("formatMessage returned error: %v", err)
+	}
 
 	if !strings.Contains(message, "Difficulty:") {
 		t.Error("Verbose message should contain difficulty")
@@ -99,7 +111,11 @@ func TestFormatMessage_MultipleChores(t *testing.T) {
 		},
 	}
 
-	message := formatMessage(person, false)
+	sender := NewSender(false, "")
+	message, err := sender.formatMessage(person, false)
+	if err != nil {
+		t.Fatalf("formatMessage returned error: %v", err)
+	}
 
 	if !strings.Contains(message, "Kitchen") {
 		t.Error("Message should contain Kitchen")
@@ -116,12 +132,12 @@ func TestFormatMessage_MultipleChores(t *testing.T) {
 }
 
 func TestNewSender(t *testing.T) {
-	sender := NewSender(true)
+	sender := NewSender(true, "")
 	if !sender.DryRun {
 		t.Error("Sender should have DryRun set to true")
 	}
 
-	sender = NewSender(false)
+	sender = NewSender(false, "")
 	if sender.DryRun {
 		t.Error("Sender should have DryRun set to false")
 	}
@@ -137,7 +153,11 @@ func TestFormatMessage_EmailContact(t *testing.T) {
 		},
 	}
 
-	message := formatMessage(person, false)
+	sender := NewSender(false, "")
+	message, err := sender.formatMessage(person, false)
+	if err != nil {
+		t.Fatalf("formatMessage returned error: %v", err)
+	}
 
 	if !strings.Contains(message, "Hi Dad!") {
 		t.Error("Message should contain greeting")
@@ -149,16 +169,20 @@ func TestFormatMessage_EmailContact(t *testing.T) {
 
 func TestFormatMessage_WithDescription(t *testing.T) {
 	person := models.Person{
-		Name:            "Alice",
-		Contact:         "+1234567890",
-		TotalEarned:     9,
+		Name:        "Alice",
+		Contact:     "+1234567890",
+		TotalEarned: 9,
 		Chores: []models.Chore{
 			{Name: "Kitchen", Difficulty: 6, Earned: 5, Description: "Clean counters, sink, and floors"},
 			{Name: "Bathroom", Difficulty: 5, Earned: 4, Description: ""},
 		},
 	}
 
-	message := formatMessage(person, false)
+	sender := NewSender(false, "")
+	message, err := sender.formatMessage(person, false)
+	if err != nil {
+		t.Fatalf("formatMessage returned error: %v", err)
+	}
 
 	if !strings.Contains(message, "Kitchen") {
 		t.Error("Message should contain chore name")
@@ -183,7 +207,11 @@ func TestFormatMessage_VerboseWithDescription(t *testing.T) {
 		},
 	}
 
-	message := formatMessage(person, true)
+	sender := NewSender(false, "")
+	message, err := sender.formatMessage(person, true)
+	if err != nil {
+		t.Fatalf("formatMessage returned error: %v", err)
+	}
 
 	if !strings.Contains(message, "Living Room") {
 		t.Error("Message should contain chore name")
@@ -209,7 +237,11 @@ func TestFormatMessage_WithPreAssignedChores(t *testing.T) {
 		},
 	}
 
-	message := formatMessage(person, false)
+	sender := NewSender(false, "")
+	message, err := sender.formatMessage(person, false)
+	if err != nil {
+		t.Fatalf("formatMessage returned error: %v", err)
+	}
 
 	if !strings.Contains(message, "Clean Bedroom") {
 		t.Error("Message should contain pre-assigned chore")

@@ -1,0 +1,9 @@
+<div><b>{{date "Monday, January 2, 2006" .Date}}</b></div>
+<div><br></div>
+<div><b>{{.PersonName}}</b>{{if and .Verbose (gt .Capacity 0)}} (Capacity: {{.Capacity}}){{end}}</div>
+{{range .AllChores}}<div>• {{.Name}} — {{currency .Earned}}</div>
+{{if .Description}}<div style="padding-left: 20px; color: #666;">{{.Description}}</div>{{end}}{{end}}
+{{if and .Verbose (gt .Capacity 0)}}<div>Total: {{currency .TotalEarned}} | Effort: {{.TotalDifficulty}} / {{.Capacity}}</div>{{else}}<div>Total: {{currency .TotalEarned}}</div>{{end}}
+<div><br></div>
+<div>─────────────────────</div>
+<div><br></div>

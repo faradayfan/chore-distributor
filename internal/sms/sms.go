@@ -2,19 +2,25 @@ package sms
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"runtime"
 	"strings"
 
 	"github.com/faradayfan/chore-distributor/internal/models"
+	"github.com/faradayfan/chore-distributor/internal/templates"
 )
 
 type Sender struct {
-	DryRun bool 
+	DryRun       bool
+	TemplatePath string
 }
 
-func NewSender(dryRun bool) *Sender {
-	return &Sender{DryRun: dryRun}
+func NewSender(dryRun bool, templatePath string) *Sender {
+	return &Sender{
+		DryRun:       dryRun,
+		TemplatePath: templatePath,
+	}
 }
 
 func (s *Sender) SendChoreAssignments(people []models.Person, verbose bool) error {
@@ -29,7 +35,11 @@ func (s *Sender) SendChoreAssignments(people []models.Person, verbose bool) erro
 			continue
 		}
 
-		message := formatMessage(person, verbose)
+		message, err := s.formatMessage(person, verbose)
+		if err != nil {
+			errs = append(errs, fmt.Sprintf("%s: %v", person.Name, err))
+			continue
+		}
 
 		if s.DryRun {
 			fmt.Printf("\n--- Would send to %s (%s) ---\n%s\n", person.Name, person.Contact, message)
@@ -51,7 +61,19 @@ func (s *Sender) SendChoreAssignments(people []models.Person, verbose bool) erro
 	return nil
 }
 
-func formatMessage(person models.Person, verbose bool) string {
+func (s *Sender) formatMessage(person models.Person, verbose bool) (string, error) {
+	// If a template path is provided, use it
+	if s.TemplatePath != "" {
+		// Check if template file exists
+		if _, err := os.Stat(s.TemplatePath); err == nil {
+			data := templates.BuildPersonData(person, verbose)
+			return templates.LoadAndExecute(s.TemplatePath, data)
+		}
+		// If template path is specified but file doesn't exist, return error
+		return "", fmt.Errorf("template file not found: %s", s.TemplatePath)
+	}
+
+	// Fall back to hardcoded format
 	var sb strings.Builder
 
 	sb.WriteString(fmt.Sprintf("Hi %s! Here are your chores:\n\n", person.Name))
@@ -95,7 +117,7 @@ func formatMessage(person models.Person, verbose bool) string {
 		sb.WriteString(fmt.Sprintf("\nEffort: %d / %d", person.TotalDifficulty, person.EffortCapacity))
 	}
 
-	return sb.String()
+	return sb.String(), nil
 }
 
 func sendViaMessages(contact, message string) error {

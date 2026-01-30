@@ -18,6 +18,8 @@ type Person struct {
 }
 
 type Config struct {
-	Chores []Chore  `json:"chores"`
-	People []Person `json:"people"`
+	Chores            []Chore `json:"chores"`
+	People            []Person `json:"people"`
+	SMSTemplatePath   string  `json:"smsTemplatePath,omitempty"`
+	NotesTemplatePath string  `json:"notesTemplatePath,omitempty"`
 }
