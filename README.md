@@ -363,6 +363,117 @@ Create `notes-template.html`:
 - For Notes templates, use HTML tags like `<div>`, `<b>`, and inline styles
 - Test templates with `--dry-run` to preview output before sending
 
+## Automatic Scheduling (macOS)
+
+You can schedule the chore distributor to run automatically at a specific day and time each week using the built-in `schedule` command.
+
+**Important:** You must build the binary first before setting up scheduling. The schedule uses the path to the currently running binary, so:
+- Build the binary: `go build -o chore-distributor .`
+- Install it to a permanent location (recommended): `~/bin/chore-distributor` or `/usr/local/bin/chore-distributor`
+- Do NOT use `go run` to set up the schedule (creates a temporary binary that gets deleted)
+
+### Quick Start
+
+```bash
+# Build the binary first
+go build -o chore-distributor .
+
+# Install a schedule (interactive setup)
+./chore-distributor schedule install
+
+# Check if it's running
+./chore-distributor schedule status
+
+# Test it immediately
+./chore-distributor schedule test
+
+# Remove the schedule
+./chore-distributor schedule uninstall
+```
+
+### How It Works
+
+The `schedule install` command:
+1. Prompts you to configure when and how to run
+2. Creates a macOS launchd agent (plist file)
+3. Automatically loads it so it runs at the scheduled time
+4. Creates a logs directory to track execution
+
+**Note:** Running `schedule install` again will update your existing schedule without needing to uninstall first.
+
+### Configuration Options
+
+During installation, you'll be asked:
+- **Day of week**: Sunday (0) through Saturday (6)
+- **Time**: Hour (0-23) and minute (0-59)
+- **Config file path**: Path to your chores configuration
+- **Send SMS**: Whether to send iMessage notifications
+- **Save to Notes**: Whether to save to Apple Notes (and note name)
+
+### Example Setup
+
+```
+$ ./chore-distributor schedule install
+
+=== Chore Distributor Scheduling Setup ===
+
+Select day of week:
+  0 - Sunday
+  1 - Monday
+  ...
+
+Enter day (0-6): 0
+Enter hour (0-23, e.g., 10 for 10 AM): 10
+Enter minute (0-59): 0
+Enter config file path (press Enter for 'chores_config.json'):
+Send iMessage notifications? (y/n): y
+Save to Apple Notes? (y/n): y
+Enter note name (default: 'Chore History'):
+
+✓ Created schedule configuration
+✓ Schedule loaded successfully
+
+Scheduled to run: Sunday at 10:0
+Logs will be written to: /path/to/logs
+```
+
+### Managing Your Schedule
+
+**Check status:**
+```bash
+./chore-distributor schedule status
+```
+
+**Update the schedule:**
+```bash
+# Just run install again - it will automatically update
+./chore-distributor schedule install
+```
+
+**Test without waiting:**
+```bash
+./chore-distributor schedule test
+```
+
+**View logs:**
+```bash
+tail -f /path/to/chore-distributor/logs/stdout.log
+tail -f /path/to/chore-distributor/logs/stderr.log
+```
+
+**Remove schedule:**
+```bash
+./chore-distributor schedule uninstall
+```
+
+### Technical Details
+
+- Creates: `~/Library/LaunchAgents/com.faradayfan.chore-distributor.plist`
+- Logs: Stored in `logs/` directory next to the executable
+- Uses macOS launchd (more reliable than cron on macOS)
+- Survives reboots automatically
+- Only runs when scheduled (doesn't run on login)
+
 ## Project Structure
 
 ```
