@@ -120,7 +120,7 @@ func promptScheduleConfig() map[string]string {
 	reader := bufio.NewReader(os.Stdin)
 	config := make(map[string]string)
 
-	fmt.Println("\n=== Chore Distributor Scheduling Setup ===\n")
+	fmt.Println("=== Chore Distributor Scheduling Setup ===")
 
 	// Day of week
 	fmt.Println("Select day of week:")
